@@ -1,5 +1,5 @@
 #include "test.hpp"
-
+#ifdef WV_CPP17
 #include <wv/unordered_array.hpp>
 #include <wv/strong_type.hpp>
 #include <wv/reflected_function.hpp>
@@ -38,9 +38,10 @@ struct type_test
 		printf( "%s :-: %s\n", typeval2str( _Tval ), typeid( _Ty ).name() );
 	}
 };
-
+#endif
 void wv::test_typeval_of()
 {
+#ifdef WV_CPP17
 	printf( " ::------- typeval_of test ------::\n" );
 	int test_int = 0;
 
@@ -52,4 +53,5 @@ void wv::test_typeval_of()
 	type_test<decltype( &type_test_struct::type_test_mint )>::print();
 	type_test<decltype( &type_test_struct::type_test_mfunc )>::print();
 	printf( " ::------------------------------::\n\n" );
+#endif
 }

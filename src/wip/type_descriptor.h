@@ -1,5 +1,5 @@
 #pragma once
-
+#ifdef WV_CPP17
 #include <stdint.h>
 
 struct typed_obj {};
@@ -79,4 +79,4 @@ struct type_descriptor
 	std::vector<_Ty*> m_objects;
 	type_layout_base<_Ty> layout;
 };
-
+#endif

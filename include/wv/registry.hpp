@@ -7,7 +7,7 @@
 
 namespace wv
 {
-
+#ifdef WV_CPP17
 template<typename _Ty>
 class registry
 {
@@ -64,5 +64,5 @@ public:
 private:
 	static inline registar<_Ty, _Pty>::entry g_entry{};
 };
-
+#endif
 }

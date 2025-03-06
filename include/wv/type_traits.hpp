@@ -1,5 +1,5 @@
 #pragma once
-
+#ifdef WV_CPP17
 #include <string>
 
 namespace wv {
@@ -83,3 +83,4 @@ template<> static float       str_to_T<float>      ( const char* _str ) { return
 
 
 }
+#endif

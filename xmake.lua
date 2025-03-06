@@ -1,5 +1,5 @@
 
-set_languages( "cxx17" )
+set_languages( "cxx11" )
 
 add_rules("mode.debug")
 add_rules("mode.release")

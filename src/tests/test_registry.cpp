@@ -1,5 +1,5 @@
 #include "test_registry.hpp"
-
+#ifdef WV_CPP17
 #include <stdio.h>
 #include <wv/registry.hpp>
 
@@ -27,9 +27,11 @@ public:
 
 	float deriv = 2.0f;
 };
+#endif
 
 void wv::test_registry()
 {
+#ifdef WV_CPP17
 	printf( " ::-------- registry test -------::\n" );
 
 	child_data data;
@@ -37,4 +39,5 @@ void wv::test_registry()
 	base_class* reg = base_class::alloc( "some_child", &data );
 
 	printf( " ::------------------------------::\n\n" );
+#endif
 }

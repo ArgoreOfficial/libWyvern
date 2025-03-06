@@ -12,7 +12,7 @@ struct ret_of<_Rty( _Args... )> {
 	using Ret = _Rty; 
 };
 
-template<auto _F, typename _Fpty = decltype( _F )>
+template<typename _Fpty, _Fpty _F>
 class reflected_function
 {
 public:
