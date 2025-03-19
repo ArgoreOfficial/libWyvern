@@ -1,8 +1,19 @@
 #include "script_engine.h"
 
+template<> bool wv::ScriptEngine::assertType<std::string>( int _stack ) { return lua_isstring( L, _stack ); }
+template<> bool wv::ScriptEngine::assertType<float>      ( int _stack ) { return lua_isnumber( L, _stack ); }
+template<> bool wv::ScriptEngine::assertType<double>     ( int _stack ) { return lua_isnumber( L, _stack ); }
+template<> bool wv::ScriptEngine::assertType<int>        ( int _stack ) { return lua_isnumber( L, _stack ); }
+template<> bool wv::ScriptEngine::assertType<bool>       ( int _stack ) { return lua_isboolean( L, _stack ); }
+
 template<>
 std::string wv::ScriptEngine::popStack() {
-	if( !isTopType( LUA_TSTRING ) ) return "";
+	if( !lua_isstring( L, -1 ) )
+	{
+		printf( "Expected string, got %s\n", lua_typename( L, -1 ) );
+		_pop();
+		return {};
+	}
 
 	std::string v = std::string( lua_tostring( L, -1 ) ); _pop();
 	return v;
@@ -10,15 +21,27 @@ std::string wv::ScriptEngine::popStack() {
 
 template<>
 int wv::ScriptEngine::popStack() {
-	if( !isTopType( LUA_TNUMBER ) ) return 0;
+	if( !lua_isnumber( L, -1 ) )
+	{
+		printf( "Expected number, got %s\n", luaL_typename( L, -1 ) );
+		_pop();
+		return {};
+	}
 
-	lua_Integer v = lua_tointeger( L, -1 ); _pop();
+	lua_Integer v = lua_tointeger( L, -1 ); 
+	_pop();
+
 	return static_cast<int>( v );
 }
 
 template<>
 float wv::ScriptEngine::popStack() {
-	if( !isTopType( LUA_TNUMBER ) ) return 0.0f;
+	if( !lua_isnumber( L, -1 ) )
+	{
+		printf( "Expected number, got %s\n", luaL_typename( L, -1 ) );
+		_pop();
+		return {};
+	}
 
 	lua_Number v = lua_tonumber( L, -1 ); _pop();
 	return static_cast<float>( v );
@@ -26,7 +49,12 @@ float wv::ScriptEngine::popStack() {
 
 template<>
 double wv::ScriptEngine::popStack() {
-	if( !isTopType( LUA_TNUMBER ) ) return 0.0;
+	if( !lua_isnumber( L, -1 ) )
+	{
+		printf( "Expected number, got %s\n", luaL_typename( L, -1 ) );
+		_pop();
+		return {};
+	}
 
 	lua_Number v = lua_tonumber( L, -1 ); _pop();
 	return static_cast<double>( v );
@@ -34,7 +62,12 @@ double wv::ScriptEngine::popStack() {
 
 template<>
 bool wv::ScriptEngine::popStack() {
-	if( !isTopType( LUA_TBOOLEAN ) ) return false;
+	if( !lua_isboolean(L, -1) )
+	{
+		printf( "Expected boolean, got %s\n", luaL_typename( L, -1 ) );
+		_pop();
+		return {};
+	}
 
 	int v = lua_toboolean( L, -1 ); _pop();
 	return static_cast<bool>( v );
@@ -55,18 +88,6 @@ void wv::ScriptEngine::assert_err( int _err )
 	std::string errstr = popStack<std::string>();
 	printf( "%s", errstr.c_str() );
 }
-
-bool wv::ScriptEngine::isTopType( int _type )
-{
-	if( lua_type( L, 1 ) != _type )
-	{
-		printf( "Invalid type\n" );
-		return false;
-	}
-
-	return true;
-}
-
 
 void wv::ScriptEngine::_pop( int _n )
 {

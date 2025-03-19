@@ -60,14 +60,20 @@ int main()
 
 	std::string test =
 		"local p = {1,2,3,2,3,2,1}\n"
+		"glob = 0\n"
+		"globstr = 'asd'\n"
 		"\n"
 		"for i=1, #p + 1 do\n"
-		"  print(p[i] + i)\n"
-		"end\n";
+		"  glob = glob + (p[i] and p[i] or 0)\n"
+		"end\n"
+		"print('glob is', glob)\n";
+
 	printf( "%s\n", test.c_str() );
 	printf( "Running:\n" );
 	luaEngine.runstring( "test_str", test );
-
+	int glob = luaEngine.getGlobal<int>( "globstr" );
+	printf( "Glob: %i\n", glob );
+	
 #ifdef WV_CPP17
 	printf( " ::------ type_layout test ------::\n" );
 	test_struct coolthing;
