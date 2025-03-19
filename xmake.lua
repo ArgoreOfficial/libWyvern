@@ -16,6 +16,6 @@ target( "libWyvern" )
         "**.h",
         "**.hpp" 
         )
-    add_files( "**.cpp" )
+    add_files( "**.cpp", "**.c" )
     add_includedirs( "include/" )
 target_end()
