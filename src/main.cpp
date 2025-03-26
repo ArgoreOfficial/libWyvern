@@ -48,7 +48,9 @@ typedef type_layout<
 #include <unordered_map>
 
 #ifdef _WIN32
-#define __PRETTY_FUNCTION__ __FUNCSIG__
+#define WV_FUNCSIG __FUNCSIG__
+#else
+#define WV_FUNCSIG __PRETTY_FUNCTION__
 #endif
 
 
@@ -79,7 +81,7 @@ struct ConstString
 };
 
 template<typename ... _Tys>
-static inline constexpr auto ConstTypeName() { return ConstString<StringLength( __PRETTY_FUNCTION__ ) + 1>( __PRETTY_FUNCTION__ ); }
+static inline constexpr auto ConstTypeName() { return ConstString<StringLength( WV_FUNCSIG ) + 1>( WV_FUNCSIG ); }
 
 size_t constexpr TypeStringOffset( const char* _a, const char* _b ) {
 	return (*_a) == (*_b) 
