@@ -47,6 +47,57 @@ typedef type_layout<
 #include <array>
 #include <unordered_map>
 
+#ifdef _WIN32
+#define __PRETTY_FUNCTION__ __FUNCSIG__
+#endif
+
+
+namespace wv {
+
+size_t constexpr StringLength( const char* str ) { 
+	return *str ? 1 + StringLength( str + 1 ) : 0;
+}
+
+template <size_t _Len>
+struct ConstString
+{
+	char data[ _Len ] = { 0 };
+	
+	constexpr ConstString( const char( &_cstr )[ _Len ] ) noexcept {
+		for( size_t i = 0; i < _Len; ++i )
+			data[ i ] = *( _cstr + i );
+	}
+
+	template<size_t _Len2>
+	constexpr ConstString( const ConstString<_Len2> _other, const size_t _offset = 0, const size_t _len = _Len ) noexcept {
+		for( size_t i = 0; i < _len; ++i )
+			data[ i ] = *( _other.c_str() + _offset + i );
+	}
+
+	constexpr const char* c_str() const noexcept { return &data[ 0 ]; }
+	constexpr std::size_t size() const noexcept { return _Len - 1; }
+};
+
+template<typename ... _Tys>
+static inline constexpr auto ConstTypeName() { return ConstString<StringLength( __PRETTY_FUNCTION__ ) + 1>( __PRETTY_FUNCTION__ ); }
+
+size_t constexpr TypeStringOffset( const char* _a, const char* _b ) {
+	return (*_a) == (*_b) 
+		? 1 + TypeStringOffset( _a + 1, _b + 1)
+		: 0;
+}
+
+template<typename _Ty>
+static constexpr auto TypeString() {
+	constexpr auto bname = ConstTypeName();
+	constexpr auto tname = ConstTypeName<_Ty>();
+	constexpr size_t size   = tname.size() - bname.size();
+	constexpr size_t offset = TypeStringOffset( bname.c_str(), tname.c_str() );
+	return ConstString<size + 1>( tname, offset, size );
+}
+
+}
+
 int main()
 {
 	wv::test_array_view();
@@ -55,6 +106,10 @@ int main()
 	wv::test_registry();
 	wv::test_strong_type();
 	wv::test_unordered_array();
+
+	printf( "%s\n", wv::TypeString<int>().c_str() );
+	printf( "%s\n", wv::TypeString<float>().c_str() );
+	printf( "%s\n", wv::TypeString<wv::ScriptEngine>().c_str() );
 
 	wv::ScriptEngine luaEngine;
 
