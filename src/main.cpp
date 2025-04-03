@@ -100,6 +100,58 @@ static constexpr auto TypeString() {
 
 }
 
+
+static constexpr uint32_t djb2( const char* _cstr )
+{
+	uint32_t hash = 5381;
+	while( *_cstr != 0 )
+		hash = ( 33 * hash ) ^ *_cstr, _cstr++;
+	return hash;
+}
+
+namespace wv {
+
+template<size_t N>
+struct const_string
+{
+	char c_str[ N + 1 ] = { 0 };
+
+	constexpr const_string( char const* _c_str ) {
+		for( size_t i = 0; i != N; ++i ) c_str[ i ] = _c_str[ i ];
+	}
+
+	constexpr size_t size() { return N; }
+};
+
+template<size_t N>
+const_string( char const ( & )[ N ] ) -> const_string<N - 1>;
+
+
+template<size_t N>
+struct const_hash
+{
+	uint32_t hash;
+	constexpr const_hash( char const* s ) {
+		hash = djb2( s );
+	}
+};
+
+template<size_t N>
+const_hash( char const ( & )[ N ] ) -> const_hash<N - 1>;
+
+}
+
+template<wv::const_string Str>
+void foo() {
+	printf( "%s\n", Str.c_str );
+}
+
+template<wv::const_hash Hash>
+void bar() {
+	printf( "%i\n", Hash.hash );
+}
+
+
 int main()
 {
 	wv::test_array_view();
@@ -108,6 +160,9 @@ int main()
 	wv::test_registry();
 	wv::test_strong_type();
 	wv::test_unordered_array();
+
+	foo<"Wyvern">();
+	bar<"Wyvern">();
 
 	printf( "%s\n", wv::TypeString<int>().c_str() );
 	printf( "%s\n", wv::TypeString<float>().c_str() );
